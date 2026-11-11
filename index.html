@@ -553,7 +553,7 @@ body{padding-bottom:62px}
     return '#' + p(r) + p(g) + p(b);
   }
   // Design Studio — live look picker
-  var studio = { colour:'Walnut Wood', door:'Slim Shaker', sheet:'Wood-Grain Laminate', top:'White Quartz (marble-look)' };
+  var studio = { colour:'Walnut Wood', door:'Slim Shaker', sheet:'Wood-Grain Laminate', top:'White Quartz (marble-look)', lastPick:'colour' };
   function studioText(){
     return 'Your look: ' + studio.colour + ' cabinets • ' + studio.door + ' doors • ' + studio.sheet + ' sheet • ' + studio.top + ' countertop';
   }
@@ -709,8 +709,11 @@ body{padding-bottom:62px}
   function updateRealPhoto(){
     var realImg = document.getElementById('studioRealImg');
     if(!realImg) return;
-    var src = doorPhotos[studio.door] || studioTopPhotos[studio.top] || studioSheetPhotos[studio.sheet] || studioPhotos[studio.colour] || 'images/hero-walnut-sage.jpg';
-    var what = doorPhotos[studio.door] ? studio.door + ' door design' : (studioTopPhotos[studio.top] ? studio.top + ' countertop' : (studioSheetPhotos[studio.sheet] ? studio.sheet + ' finish' : studio.colour));
+    var src, what;
+    if(studio.lastPick === 'door' && doorPhotos[studio.door]){ src = doorPhotos[studio.door]; what = studio.door + ' door design'; }
+    else if(studio.lastPick === 'top' && studioTopPhotos[studio.top]){ src = studioTopPhotos[studio.top]; what = studio.top + ' countertop'; }
+    else if(studio.lastPick === 'sheet' && studioSheetPhotos[studio.sheet]){ src = studioSheetPhotos[studio.sheet]; what = studio.sheet + ' finish'; }
+    else { src = studioPhotos[studio.colour] || 'images/hero-walnut-sage.jpg'; what = studio.colour; }
     realImg.src = src;
     realImg.alt = 'Real look showing ' + what + ' — photo preview (your look: ' + studio.colour + ' • ' + studio.door + ' • ' + studio.sheet + ' • ' + studio.top + ')';
   }
@@ -772,6 +775,7 @@ body{padding-bottom:62px}
         group.querySelectorAll('.pick').forEach(function(x){ x.classList.remove('active'); });
         o.classList.add('active');
         studio[key] = o.getAttribute('data-value');
+        studio.lastPick = key;
         applyStudioLook();
         renderStudio();
       });
